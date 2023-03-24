@@ -8,7 +8,11 @@
 #include"system.h"
 Student *sp=NULL;
 Teacher *tp=NULL;
+//Student *sp_out=NULL;//未声明为外部
+//Teacher *tp_out=NULL;//未声明为外部
 Principle principle={};
+//int Total_out=-1;//未声明为外部
+//int Total_T_out=-1;//未声明为外部
 char myID[10]={};
 int Total=-1;
 int Total_T=-1;
@@ -23,6 +27,21 @@ int Math_min=-1;
 int Math_avg=-1;
 char ID[]="00000000";
 
+/*void init_outNum()
+{
+	FILE* out_num_rp=fopen("out_num.txt","r");
+	FILE* teacher_out_rp=fopen("teacher_out.txt","r");
+	fscanf("%d %d",&Total_out,&Total_T_out);
+	printf("%d %d\n",otal_out,Total_T_out);
+	sp_out=mailloc(sizeof(Student)*Total_out);
+	tp_out=malloc(sizeof(Teacher)*Total_T_out);
+	for(int i=0;i<Total_T_out;i++)
+	{
+		fscanf(out_num_rp,"%s %s %c %c",);
+	}
+	
+	
+}*/
 void init()
 {
 	//导入文件数据到堆内存中
@@ -62,10 +81,10 @@ void init()
 		}
 	}
 	
-	//根据相同id写入帐号密码是否锁定
+	//根据相同id写入帐号密码是否锁定,尝试登入次数
 	for(int i=0;i<Total;i++)
 	{
-		fscanf(students_account_rp,"%s %s %c",tem.id,tem.password,&tem.is_locked);
+		fscanf(students_account_rp,"%s %s %c %c",tem.id,tem.password,&tem.is_locked,&tem.attempt);
 	//	printf("%s %s %c\n",tem.id,tem.password,tem.is_locked);
 		for(int j=0;j<Total;j++)
 		{
@@ -73,6 +92,7 @@ void init()
 			{
 				strcpy((sp+j)->password,tem.password);
 				(sp+j)->is_locked=tem.is_locked;
+				(sp+j)->attempt=tem.attempt;
 			}
 		}
 	}
@@ -98,28 +118,23 @@ void init()
 	FILE* teacher_info_rp=fopen("teacher_info.txt","r");
 	FILE* teacher_account_rp=fopen("teacher_account.txt","r");
 	Teacher temT={};
-	puts("2xxxxxxxxxxxxxxxx");
+	//puts("2xxxxxxxxxxxxxxxx");
 	for(int i=0;i<Total_T;i++)
 	{
 		fscanf(teacher_info_rp,"%s %s %c %c",(tp+i)->id,(tp+i)->name,&(tp+i)->gender,&(tp+i)->is_out);
 	}
 	
-	puts("3xxxxxxxxxxxxxxxx");
+	
 	for(int i=0;i<Total_T;i++)
 	{
-		//printf("id=%s name=%s password=%s\ngender=%c is_out=%c is_locked=%c\n",(tp+i)->id,(tp+i)->name,(tp+i)->password,(tp+i)->gender,(tp+i)->is_out,(tp+i)->is_locked);	
-		printf("%s %s %c\n",temT.id,temT.password,temT.is_locked);
-	}
-	//puts("11111111111111");
-	for(int i=0;i<Total_T;i++)
-	{
-		fscanf(teacher_account_rp,"%s %s %c",temT.id,temT.password,&temT.is_locked);
+		fscanf(teacher_account_rp,"%s %s %c %c",temT.id,temT.password,&temT.is_locked,&tem.attempt);
 		for(int j=0;j<Total_T;j++)
 		{
 			if(strcmp((tp+j)->id,temT.id)==0)
 			{
 				strcpy((tp+j)->password,temT.password);
 				(tp+j)->is_locked=temT.is_locked;
+				(tp+j)->attempt=tem.attempt;
 			}
 		}
 	}
@@ -135,9 +150,9 @@ void init()
 	// 导入校长帐号密码
 	FILE* principle_account_rp=fopen("principle_account.txt","r");
 	if(principle_account_rp==NULL)perror("fopen:");
-	fscanf(principle_account_rp,"%s %s",principle.id,principle.password);
+	fscanf(principle_account_rp,"%s %s %c",principle.id,principle.password,&principle.attempt);
 	fclose(principle_account_rp);
-	printf("%s %s",principle.id,principle.password);
+	printf("%s %s %c",principle.id,principle.password,principle.attempt);
 }
 
 void show()
@@ -197,9 +212,16 @@ void certify_principle()
 		printf("\n%s %s\n",account,principle.id);
 		printf("%d\n",strcmp(account,principle.id));
 		if(strcmp(account,principle.id)==0)
-		{
+		{	
+			if(principle.attempt=='3')
+			{
+				puts("该帐号已锁定");
+				return;
+			}
+			principle.attempt++;
 			if(strcmp(password,principle.password)==0)
 			{
+				principle.attempt='0';
 				principle_show();
 			}
 			else
@@ -210,6 +232,11 @@ void certify_principle()
 		}
 		else
 		{
+			if(principle.attempt=='3')
+			{
+				puts("该帐号已锁定");
+				return;
+			}
 			count++;
 			puts("帐号不存在，请重新输入\n");
 		}
@@ -217,6 +244,7 @@ void certify_principle()
 	}
 	
 	puts("输入错误超过三次\n");
+	
 	return ;
 }
 	
@@ -247,13 +275,30 @@ void certify_teacher()
 		{
 			if(strcmp(account,(tp+i)->id)==0)
 			{
+				if((tp+i)->attempt=='3')
+				{
+					puts("该帐号已锁定");
+					return;
+				}
+				(tp+i)->attempt++;
 				if(strcmp(password,(tp+i)->password)==0)
 				{
+					if((tp+i)->is_out==1)
+					{
+						puts("该教师已离职");
+						return;
+					}
+					(tp+i)->attempt='0';
 					strcpy(myID,password);
 					teacher_show();
 				}
 				else 
 				{
+					if((tp+i)->attempt=='3')
+					{
+						puts("该帐号已锁定");
+						return;
+					}
 					count++;
 					puts("帐号密码不一致，请重新输入\n");
 					break;
@@ -266,6 +311,7 @@ void certify_teacher()
 			count++;
 		}	
 	}
+	
 	
 	puts("输入错误超过三次\n");
 	return ;
@@ -297,14 +343,31 @@ void certify_std()
 		{
 			if(strcmp(account,(sp+i)->id)==0)
 			{
+				if((sp+i)->attempt=='3')
+				{
+					puts("该帐号已锁定");
+					return;
+				}
+				(sp+i)->attempt++;
 				if(strcmp(password,(sp+i)->password)==0)
 				{
+					if((sp+i)->is_out==1)
+					{
+						puts("该学生已休学");
+						return;
+					}
+					(sp+i)->attempt='0';
 					strcpy(myID,password);
 					student_show();
 				}
 				else 
 				{
 					count++;
+					if((sp+i)->attempt=='3')
+					{
+						puts("该帐号已锁定");
+						return;
+					}
 					puts("帐号密码不一致，请重新输入\n");
 					break;
 				}
@@ -330,10 +393,10 @@ void start()
 void principle_show()
 {
 	int com=0;
-	while(com<1||com>7)
+	while(com<1||com>8)
 	{
 		puts("请选择操作");	
-		printf("1.重置校长密码\n2.重置教师密码\n3.添加教师\n4.删除教师\n5.显示在职教师\n6.显示离职教师\n7.解锁教师帐号\n");
+		printf("1.重置校长密码\n2.重置教师密码\n3.添加教师\n4.删除教师\n5.显示在职教师\n6.显示离职教师\n7.解锁教师帐号\n8.修改校长密码");
 		scanf("%d",&com);
 		switch(com)
 		{
@@ -357,6 +420,11 @@ void principle_show()
 				break;
 			case 7:
 				puts("7");
+				break;
+			case 8:
+				puts("8");
+				
+				strcpy(principle.password,"1111");
 				break;
 			default:
 				puts("请重新选择操作");
@@ -436,13 +504,22 @@ void student_show()
 
 void end()
 {
+	/*FILE* total_num_wp=fopen("total_num.txt","w");
+	
+	FILE* students_out_ap=fopen("students_out.txt","a");
+
+	FILE* students_score_wp=fopen("students_score.txt","w");
+	FILE* students_account_wp=fopen("students_account.txt","w");
+	FILE* students_info_wp=fopen("students_info.txt","w");
+	FILE* scores_wp=fopen("scores.txt","w");
+	
+	FILE* teacher_info_wp=fopen("teacher_info.txt","w");
+	FILE* teacher_account_wp=fopen("teacher_account.txt","w");
+	FILE* teacher_out_ap=fopen("teacher_out.txt","a");
+	*/
+	//校长信息堆内存写入文件
+	FILE* principle_account_wp=fopen("principle_account.txt","w");
+	fprintf(principle_account_wp,"%s %s %c\n",principle.id,principle.password,principle.attempt);
+	fclose(principle_account_wp);
 
 }
-
-/*int main()
-{
-		init();
-			start();
-				end();
-}*/
-

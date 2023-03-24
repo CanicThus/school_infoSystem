@@ -5,6 +5,7 @@ typedef struct Principle
 {	
     char password[20];
     char id[10];
+    char attempt;
 } Principle;
 typedef struct Student
 {	
@@ -17,12 +18,14 @@ typedef struct Student
     char  is_locked;
     char  is_out;	
     char gender;
+    char attempt;
 } Student;
 typedef struct Teacher
 {	
     char name[20];
 	char password[20];
 	char id[10];
+	char attempt;
 	char is_locked; //一律0为假 1为真	
 	char gender;//M=male F=female
 	char is_out;
