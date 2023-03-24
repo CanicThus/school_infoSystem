@@ -1,11 +1,16 @@
 
 #ifndef SYSTEM_H
 #define SYSTEM_H
+typedef struct Principle
+{	
+    char password[20];
+    char id[10];
+} Principle;
 typedef struct Student
 {	
     char name[20];
     char password[20];
-    char id[8];
+    char id[9];
     int math;
     int english;
     int chinese;
@@ -17,7 +22,7 @@ typedef struct Teacher
 {	
     char name[20];
 	char password[20];
-	char id[12];
+	char id[10];
 	char is_locked; //一律0为假 1为真	
 	char gender;//M=male F=female
 	char is_out;
@@ -36,7 +41,12 @@ extern int EN_avg;
 extern int Math_min;
 extern int Math_avg;
 extern char ID[];
+extern char myID[];
+extern Principle principle;
 
+void certify_principle();
+void certify_std();
+void certify_teacher();
 void show();
 void start();
 void teacher_show();

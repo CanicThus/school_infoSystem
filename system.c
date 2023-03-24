@@ -8,6 +8,8 @@
 #include"system.h"
 Student *sp=NULL;
 Teacher *tp=NULL;
+Principle principle={};
+char myID[10]={};
 int Total=-1;
 int Total_T=-1;
 int CH_max=-1;
@@ -20,6 +22,7 @@ int EN_avg=-1;
 int Math_min=-1;
 int Math_avg=-1;
 char ID[]="00000000";
+
 void init()
 {
 	//导入文件数据到堆内存中
@@ -89,17 +92,19 @@ void init()
 		printf("id=%s gender=%c name=%s\npassword=%s is_locked=%c is_out=%c\n----\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->password,(sp+i)->is_locked,(sp+i)->is_out);
 	}
 */
+	puts("xxxxxxxxxxxxxxxx");
 	// 导入教师信息
 	tp=malloc(sizeof(Teacher)*Total_T);
 	FILE* teacher_info_rp=fopen("teacher_info.txt","r");
 	FILE* teacher_account_rp=fopen("teacher_account.txt","r");
 	Teacher temT={};
+	puts("2xxxxxxxxxxxxxxxx");
 	for(int i=0;i<Total_T;i++)
 	{
 		fscanf(teacher_info_rp,"%s %s %c %c",(tp+i)->id,(tp+i)->name,&(tp+i)->gender,&(tp+i)->is_out);
 	}
 	
-//	puts("xxxxxxxxxxxxxxxx");
+	puts("3xxxxxxxxxxxxxxxx");
 	for(int i=0;i<Total_T;i++)
 	{
 		//printf("id=%s name=%s password=%s\ngender=%c is_out=%c is_locked=%c\n",(tp+i)->id,(tp+i)->name,(tp+i)->password,(tp+i)->gender,(tp+i)->is_out,(tp+i)->is_locked);	
@@ -124,6 +129,15 @@ void init()
 	{
 		printf("id=%s name=%s password=%s\ngender=%c is_out=%c is_locked=%c\n",(tp+i)->id,(tp+i)->name,(tp+i)->password,(tp+i)->gender,(tp+i)->is_out,(tp+i)->is_locked);	
 	}
+	fclose(teacher_info_rp);
+	fclose(teacher_account_rp);
+	puts("aaaaa");
+	// 导入校长帐号密码
+	FILE* principle_account_rp=fopen("principle_account.txt","r");
+	if(principle_account_rp==NULL)perror("fopen:");
+	fscanf(principle_account_rp,"%s %s",principle.id,principle.password);
+	fclose(principle_account_rp);
+	printf("%s %s",principle.id,principle.password);
 }
 
 void show()
@@ -138,93 +152,181 @@ void show()
 		{
 			case 1:
 				puts("1");
-				student_show();
+				certify_std();
+				return ;
 				break;
 			case 2:
 				puts("2");
-				teacher_show();
+				certify_teacher();
+				return ;
 				break;
 			case 3:
 				puts("3");
-				principle_show();
+				certify_principle();
+				return;
 				break;
 			default:
 				puts("请重新选择登入类型");
 		}
-	}	
+	}
+	return;
+}
+
+void certify_principle()
+{
+	int count=1;
+	char account[10]={};
+	char password[20]={};
+	while(count<4)
+	{
+		printf("第%d次操作\n",count);
+		stdin->_IO_read_ptr =stdin->_IO_read_end;
+		printf("请输入帐号：\n");
+		fgets(account,10,stdin);
+		stdin->_IO_read_ptr =stdin->_IO_read_end;
+		printf("请输入密码：");
+		fgets(password,20,stdin);
+		stdin->_IO_read_ptr =stdin->_IO_read_end;
+		//将回车改为\0
+		for(int i=0;i<20;i++)
+		{
+			if(password[i]=='\n')password[i]='\0';
+		}
+		
+		//判断帐号密码相同
+		printf("\n%s %s\n",account,principle.id);
+		printf("%d\n",strcmp(account,principle.id));
+		if(strcmp(account,principle.id)==0)
+		{
+			if(strcmp(password,principle.password)==0)
+			{
+				principle_show();
+			}
+			else
+			{
+				count++;
+				puts("帐号密码不一致，请重新输入\n");
+			}
+		}
+		else
+		{
+			count++;
+			puts("帐号不存在，请重新输入\n");
+		}
+		
+	}
+	
+	puts("输入错误超过三次\n");
+	return ;
+}
+	
+void certify_teacher()
+{
+	int count=1;
+	char account[10]={};
+	char password[20]={};
+	while(count<4)
+	{
+		printf("第%d次操作\n",count);
+		stdin->_IO_read_ptr =stdin->_IO_read_end;
+		printf("请输入帐号：\n");
+		fgets(account,10,stdin);
+		stdin->_IO_read_ptr =stdin->_IO_read_end;
+		printf("请输入密码：");
+		fgets(password,20,stdin);
+		stdin->_IO_read_ptr =stdin->_IO_read_end;
+		//将回车改为\0
+		for(int i=0;i<20;i++)
+		{
+			if(password[i]=='\n')password[i]='\0';
+		}
+		
+		//判断帐号密码相同
+		int i=0;
+		for(;i<Total_T;i++)
+		{
+			if(strcmp(account,(tp+i)->id)==0)
+			{
+				if(strcmp(password,(tp+i)->password)==0)
+				{
+					strcpy(myID,password);
+					teacher_show();
+				}
+				else 
+				{
+					count++;
+					puts("帐号密码不一致，请重新输入\n");
+					break;
+				}
+			}
+		}
+		if(i==Total_T)
+		{
+			printf("当前帐号不存在\n");
+			count++;
+		}	
+	}
+	
+	puts("输入错误超过三次\n");
+	return ;
+}
+void certify_std()
+{
+	int count=1;
+	char account[9]={};
+	char password[20]={};
+	while(count<4)
+	{
+		printf("第%d次操作\n",count);
+		stdin->_IO_read_ptr =stdin->_IO_read_end;
+		printf("请输入帐号：\n");
+		fgets(account,9,stdin);
+		stdin->_IO_read_ptr =stdin->_IO_read_end;
+		printf("请输入密码：");
+		fgets(password,20,stdin);
+		stdin->_IO_read_ptr =stdin->_IO_read_end;
+		//将回车改为\0
+		for(int i=0;i<20;i++)
+		{
+			if(password[i]=='\n')password[i]='\0';
+		}
+		
+		//判断帐号密码相同
+		int i=0;
+		for(;i<Total;i++)
+		{
+			if(strcmp(account,(sp+i)->id)==0)
+			{
+				if(strcmp(password,(sp+i)->password)==0)
+				{
+					strcpy(myID,password);
+					student_show();
+				}
+				else 
+				{
+					count++;
+					puts("帐号密码不一致，请重新输入\n");
+					break;
+				}
+			}
+		}
+		if(i==Total)
+		{
+			printf("当前帐号不存在\n");
+			count++;
+		}	
+	}
+	
+	puts("输入错误超过三次\n");
+	return ;
 }
 void start()
 {
-	while(1)
-	{
-		show();
-	}	
+	show();
+	return;
+		
 }
-void teacher_show()
-{
-	int com=0;
-	while(com<1||com>8)
-	{
-		puts("请选择操作");	
-		printf("1.添加学生\n2.删除学生\n3.查找学生\n4.修改学生信息\n5.录入学生成绩\n6.重置学生密码\n7.显示所有在读学生\n8.显示休学学生\n");
-		scanf("%d",&com);
-		switch(com)
-		{
-			case 1:
-				puts("1");
-				break;
-			case 2:
-				puts("2");
-				break;
-			case 3:
-				puts("3");
-				break;
-			case 4:
-				puts("4");
-				break;
-			case 5:
-				puts("5");
-				break;
-			case 6:
-				puts("6");
-				break;
-			case 7:
-				puts("7");
-				break;
-			default:
-				puts("请重新选择操作");
-				break;
-		}
-	}	
-}
-void student_show()
-{	
-	int com=0;
-	while(com<1||com>4)
-	{
-		puts("请选择操作");	
-		printf("1.查询成绩\n2.显示排名\n3.查询个人信息\n4.修改密码\n");
-		scanf("%d",&com);
-		switch(com)
-		{
-			case 1:
-				puts("1");
-				break;
-			case 2:
-				puts("2");
-				break;
-			case 3:
-				puts("3");
-				break;
-			case 4:
-				puts("4");
-				break;
-			default:
-				puts("请重新选择操作");
-				break;
-		}
-	}
-}
+
 void principle_show()
 {
 	int com=0;
@@ -260,8 +362,77 @@ void principle_show()
 				puts("请重新选择操作");
 				break;
 		}
+	}	
+}
+void teacher_show()
+{
+	int com=0;
+	while(com<1||com>8)
+	{
+		puts("请选择操作");	
+		printf("1.添加学生\n2.删除学生\n3.查找学生\n4.修改学生信息\n5.录入学生成绩\n6.重置学生密码\n7.显示所有在读学生\n8.显示休学学生\n");
+		scanf("%d",&com);
+		switch(com)
+		{
+			case 1:
+				puts("1");
+				break;
+			case 2:
+				puts("2");
+				break;
+			case 3:
+				puts("3");
+				break;
+			case 4:
+				puts("4");
+				break;
+			case 5:
+				puts("5");
+				break;
+			case 6:
+				puts("6");
+				break;
+			case 7:
+				puts("7");
+				break;
+			case 8:
+				puts("8");
+				break;
+			default:
+				puts("请重新选择操作");
+				break;
+		}
+	}	
+}
+void student_show()
+{	
+	int com=0;
+	while(com<1||com>4)
+	{
+		puts("请选择操作");	
+		printf("1.查询成绩\n2.显示排名\n3.查询个人信息\n4.修改密码\n");
+		scanf("%d",&com);
+		switch(com)
+		{
+			case 1:
+				puts("1");
+				break;
+			case 2:
+				puts("2");
+				break;
+			case 3:
+				puts("3");
+				break;
+			case 4:
+				puts("4");
+				break;
+			default:
+				puts("请重新选择操作");
+				break;
+		}
 	}
 }
+
 
 void end()
 {
