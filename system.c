@@ -283,7 +283,7 @@ void certify_teacher()
 				(tp+i)->attempt++;
 				if(strcmp(password,(tp+i)->password)==0)
 				{
-					if((tp+i)->is_out==1)
+					if((tp+i)->is_out=='1')
 					{
 						puts("该教师已离职");
 						return;
@@ -351,7 +351,7 @@ void certify_std()
 				(sp+i)->attempt++;
 				if(strcmp(password,(sp+i)->password)==0)
 				{
-					if((sp+i)->is_out==1)
+					if((sp+i)->is_out=='1')
 					{
 						puts("该学生已休学");
 						return;
@@ -423,7 +423,6 @@ void principle_show()
 				break;
 			case 8:
 				puts("8");
-				
 				strcpy(principle.password,"1111");
 				break;
 			default:
@@ -438,7 +437,7 @@ void teacher_show()
 	while(com<1||com>8)
 	{
 		puts("请选择操作");	
-		printf("1.添加学生\n2.删除学生\n3.查找学生\n4.修改学生信息\n5.录入学生成绩\n6.重置学生密码\n7.显示所有在读学生\n8.显示休学学生\n");
+		printf("1.添加学生\n2.删除学生\n3.查找学生\n4.修改学生信息\n5.录入学生成绩\n6.重置学生密码\n7.显示所有在读学生\n8.test显示休学学生\n");
 		scanf("%d",&com);
 		switch(com)
 		{
@@ -465,6 +464,7 @@ void teacher_show()
 				break;
 			case 8:
 				puts("8");
+				strcpy((tp+2)->name,"AAAA");
 				break;
 			default:
 				puts("请重新选择操作");
@@ -506,17 +506,26 @@ void end()
 {
 	/*FILE* total_num_wp=fopen("total_num.txt","w");
 	
-	FILE* students_out_ap=fopen("students_out.txt","a");
+	//FILE* students_out_ap=fopen("students_out.txt","a");
 
 	FILE* students_score_wp=fopen("students_score.txt","w");
 	FILE* students_account_wp=fopen("students_account.txt","w");
 	FILE* students_info_wp=fopen("students_info.txt","w");
 	FILE* scores_wp=fopen("scores.txt","w");
-	
+	*/
+	//堆内存教师信息写入文件
 	FILE* teacher_info_wp=fopen("teacher_info.txt","w");
 	FILE* teacher_account_wp=fopen("teacher_account.txt","w");
-	FILE* teacher_out_ap=fopen("teacher_out.txt","a");
-	*/
+	for(int i=0;i<Total_T;i++)
+	{
+		fprintf(teacher_info_wp,"%s %s %c %c\n",(tp+i)->id,(tp+i)->name,(tp+i)->gender,(tp+i)->is_out);
+		fprintf(teacher_account_wp,"%s %s %c %c\n",(tp+i)->id,(tp+i)->password,(tp+i)->is_locked,(tp+i)->attempt);
+	}
+	fclose(teacher_account_wp);
+	fclose(teacher_info_wp);
+	
+	//FILE* teacher_out_ap=fopen("teacher_out.txt","a");
+	
 	//校长信息堆内存写入文件
 	FILE* principle_account_wp=fopen("principle_account.txt","w");
 	fprintf(principle_account_wp,"%s %s %c\n",principle.id,principle.password,principle.attempt);
