@@ -42,6 +42,21 @@ char ID[]="00000000";
 	
 	
 }*/
+
+void test()
+{
+	CH_max=1;CH_min=1;CH_avg=1;
+	EN_max=1;EN_min=1;EN_avg=1;
+	Math_max=1;Math_min=1;Math_avg=1;
+	strcpy((sp+2)->name,"TEST");
+	strcpy((sp+2)->password,"TEST");
+	(sp+2)->gender='T';(sp+2)->is_locked='T';
+	(sp+2)->attempt='T';(sp+2)->is_out='T';
+	(sp+2)->chinese=1;(sp+2)->math=1;
+	(sp+2)->english=1;
+//	Total=1;Total_T=1;
+}
+
 void init()
 {
 	//导入文件数据到堆内存中
@@ -504,15 +519,34 @@ void student_show()
 
 void end()
 {
-	/*FILE* total_num_wp=fopen("total_num.txt","w");
-	
+	//学生、教师总人数写入
+	FILE* total_num_wp=fopen("total_num.txt","w");
+	fprintf(total_num_wp,"%d %d",Total,Total_T);
+	fclose(total_num_wp);
 	//FILE* students_out_ap=fopen("students_out.txt","a");
-
+	
+	//学生信息写入文件	
 	FILE* students_score_wp=fopen("students_score.txt","w");
 	FILE* students_account_wp=fopen("students_account.txt","w");
 	FILE* students_info_wp=fopen("students_info.txt","w");
+	
+	for(int i=0;i<Total;i++)
+	{
+		fprintf(students_score_wp,"%s %d %d %d\n",(sp+i)->id,(sp+i)->chinese,(sp+i)->math,(sp+i)->english);
+		fprintf(students_account_wp,"%s %s %c %c\n",(sp+i)->id,(sp+i)->password,(sp+i)->is_locked,(sp+i)->attempt);
+		fprintf(students_info_wp,"%s %s %c %c\n",(sp+i)->id,(sp+i)->name,(sp+i)->gender,(sp+i)->is_out);
+	}
+	fclose(students_score_wp);
+	fclose(students_account_wp);
+	fclose(students_info_wp);
+	
+	//MAX，IMN，AVG写入文件
 	FILE* scores_wp=fopen("scores.txt","w");
-	*/
+	fprintf(scores_wp,"%d %d %d\n",CH_max,CH_min,CH_avg);
+	fprintf(scores_wp,"%d %d %d\n",Math_max,Math_min,Math_avg);
+	fprintf(scores_wp,"%d %d %d\n",EN_max,EN_min,EN_avg);
+	fclose(scores_wp);
+	
 	//堆内存教师信息写入文件
 	FILE* teacher_info_wp=fopen("teacher_info.txt","w");
 	FILE* teacher_account_wp=fopen("teacher_account.txt","w");

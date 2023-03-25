@@ -59,6 +59,7 @@ void end();
 void init();
 void start();
 
+void test();
 
 #endif//SYSTEM_H
 
