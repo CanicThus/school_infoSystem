@@ -25,4 +25,5 @@ void list_all_std();
 //读所有学生信息，显示标志为在校的学生
 //方法 显示退学学生
 void list_out_std();
+void add_grades();
 #endif//TEACHER_H

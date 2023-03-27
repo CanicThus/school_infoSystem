@@ -4,7 +4,7 @@ OBJ=main.o system.o tools.o principle.o student.o teacher.o
 FLAG=-Wall -Werror
 
 all:$(OBJ)
-	$(CC) -o $(BIN) $(OBJ)
+	$(CC) -o $(BIN) $(OBJ) -lcrypto
 main.o:main.c tools.h system.h principle.h student.h teacher.h
 	$(CC) -c main.c $(FLAG)
 system.o:system.c tools.h system.h principle.h student.h teacher.h

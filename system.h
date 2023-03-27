@@ -3,14 +3,14 @@
 #define SYSTEM_H
 typedef struct Principle
 {	
-    char password[20];
+    char password[33];
     char id[10];
     char attempt;
 } Principle;
 typedef struct Student
 {	
     char name[20];
-    char password[20];
+    char password[33];
     char id[9];
     int math;
     int english;
@@ -23,7 +23,7 @@ typedef struct Student
 typedef struct Teacher
 {	
     char name[20];
-	char password[20];
+	char password[33];
 	char id[10];
 	char attempt;
 	char is_locked; //一律0为假 1为真	

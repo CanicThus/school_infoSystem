@@ -8,13 +8,12 @@
 #include"system.h"
 #include "teacher.h"
 #include "student.h"
+#include "principle.h"
+
 Student *sp=NULL;
 Teacher *tp=NULL;
-//Student *sp_out=NULL;//未声明为外部
-//Teacher *tp_out=NULL;//未声明为外部
 Principle principle={};
-//int Total_out=-1;//未声明为外部
-//int Total_T_out=-1;//未声明为外部
+
 char myID[10]={};
 int Total=-1;
 int Total_T=-1;
@@ -27,27 +26,28 @@ int EN_min=-1;
 int EN_avg=-1;
 int Math_min=-1;
 int Math_avg=-1;
-char ID[]="00000000";
 
-/*void init_outNum()
-{
-	FILE* out_num_rp=fopen("out_num.txt","r");
-	FILE* teacher_out_rp=fopen("teacher_out.txt","r");
-	fscanf("%d %d",&Total_out,&Total_T_out);
-	printf("%d %d\n",otal_out,Total_T_out);
-	sp_out=mailloc(sizeof(Student)*Total_out);
-	tp_out=malloc(sizeof(Teacher)*Total_T_out);
-	for(int i=0;i<Total_T_out;i++)
-	{
-		fscanf(out_num_rp,"%s %s %c %c",);
-	}
-	
-	
-}*/
 
+//for test and first ENmd5
 void test()
-{
-	CH_max=1;CH_min=1;CH_avg=1;
+{	
+	//教师密码初始化md5
+	for(int i=0;i<Total;i++)
+	{
+		md5((sp+i)->password);
+		strcpy((sp+i)->password,buf);	
+	}
+	//教师密码初始化md5
+	for(int i=0;i<Total_T;i++)
+	{
+		md5((tp+i)->password);
+		strcpy((tp+i)->password,buf);	
+	}
+	//校长密码初始化md5
+	md5(principle.password);
+	strcpy(principle.password,buf);
+	
+	/*CH_max=1;CH_min=1;CH_avg=1;
 	EN_max=1;EN_min=1;EN_avg=1;
 	Math_max=1;Math_min=1;Math_avg=1;
 	strcpy((sp+2)->name,"TEST");
@@ -55,24 +55,17 @@ void test()
 	(sp+2)->gender='T';(sp+2)->is_locked='T';
 	(sp+2)->attempt='T';(sp+2)->is_out='T';
 	(sp+2)->chinese=1;(sp+2)->math=1;
-	(sp+2)->english=1;
+	(sp+2)->english=1;*/
 //	Total=1;Total_T=1;
 }
 
+//导入文件数据到堆内存中
 void init()
 {
-	//导入文件数据到堆内存中
+	
 	init_Total_txt();
 	
 	init_stu();
-
-
-
-/*	for(int i=0;i<Total;i++)
-	{
-		printf("id=%s gender=%c name=%s\npassword=%s is_locked=%c is_out=%c\n----\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->password,(sp+i)->is_locked,(sp+i)->is_out);
-	}
-*/
 	
 	init_teacher();
 	
@@ -87,7 +80,7 @@ void show()
 		int com=0;
 		for(;com<1||com>4;)
 		{
-		
+			system("clear");
 			printf("请选择登入类型\n");
 			printf("1.学生登入\n2.教师登入\n3.校长登入\n4.退出\n");
 			scanf("%d",&com);
@@ -116,6 +109,7 @@ void show()
 	}
 }
 
+//login certify for principle
 void certify_principle()
 {
 	int count=1;
@@ -138,8 +132,6 @@ void certify_principle()
 		}
 		
 		//判断帐号密码相同
-		printf("\n%s %s\n",account,principle.id);
-		printf("%d\n",strcmp(account,principle.id));
 		if(strcmp(account,principle.id)==0)
 		{	
 			if(principle.attempt=='3')
@@ -148,9 +140,15 @@ void certify_principle()
 				return;
 			}
 			principle.attempt++;
-			if(strcmp(password,principle.password)==0)
+			md5(password);
+			if(strcmp(buf,principle.password)==0)
 			{
 				principle.attempt='0';
+				if(is_first_login_t(principle.password))
+				{
+					change_password_p(principle.id);
+					return;
+				}
 				principle_show();
 				return;
 			}
@@ -177,12 +175,14 @@ void certify_principle()
 	
 	return ;
 }
-	
+
+//login certification for teacher	
 void certify_teacher()
 {
 	int count=1;
 	char account[10]={};
 	char password[20]={};
+	// you have three times to try to log in
 	while(count<4)
 	{
 		printf("第%d次操作\n",count);
@@ -211,7 +211,8 @@ void certify_teacher()
 					return;
 				}
 				(tp+i)->attempt++;
-				if(strcmp(password,(tp+i)->password)==0)
+				md5(password);
+				if(strcmp(buf,(tp+i)->password)==0)
 				{
 					if((tp+i)->is_out=='1')
 					{
@@ -220,6 +221,11 @@ void certify_teacher()
 					}
 					(tp+i)->attempt='0';
 					strcpy(myID,account);
+					if(is_first_login_t((tp+i)->password))
+					{
+						change_password_t((tp+i)->id);
+						return;
+					}
 					teacher_show();
 					return;
 				}
@@ -241,12 +247,12 @@ void certify_teacher()
 			printf("当前帐号不存在\n");
 			count++;
 		}	
-	}
-	
-	
+	}	
 	puts("输入错误超过三次\n");
 	return ;
 }
+
+// login certification for students
 void certify_std()
 {
 	int count=1;
@@ -280,7 +286,8 @@ void certify_std()
 					return;
 				}
 				(sp+i)->attempt++;
-				if(strcmp(password,(sp+i)->password)==0)
+				md5(password);
+				if(strcmp(buf,(sp+i)->password)==0)
 				{
 					if((sp+i)->is_out=='1')
 					{
@@ -289,6 +296,11 @@ void certify_std()
 					}
 					(sp+i)->attempt='0';
 					strcpy(myID,account);
+					if(is_first_login_t((sp+i)->password))
+					{
+						change_password((sp+i)->id);
+						return;
+					}
 					student_show();
 					return;
 				}
@@ -317,7 +329,6 @@ void certify_std()
 }
 void start()
 {
-		//system("clear");
 		show();			
 }
 
@@ -325,6 +336,7 @@ void principle_show()
 {
 	while(1)
 	{
+		system("clear");
 		int com=0;
 		while(com<1||com>9)
 		{
@@ -336,28 +348,35 @@ void principle_show()
 			{
 				case 1:
 					puts("1");
+					reset_password_P();
 					break;
 				case 2:
 					puts("2");
+					reset_password_T();
 					break;
 				case 3:
 					puts("3");
+					add_T();
 					break;
 				case 4:
 					puts("4");
+					del_T();
 					break;
 				case 5:
 					puts("5");
+					list_all_T();
 					break;
 				case 6:
 					puts("6");
+					list_out_T();
 					break;
 				case 7:
 					puts("7");
+					unlock_T();
 					break;
 				case 8:
 					puts("8");
-					strcpy(principle.password,"1111");
+					change_password_p(principle.password);
 					break;
 				case 9:
 					return;
@@ -374,12 +393,13 @@ void teacher_show()
 {
 	while(1)
 	{
+		system("clear");
 		int com=0;
 		while(com<1||com>10)
 		{	
 			system("clear");
 			puts("请选择操作");	
-			printf("1.添加学生\n2.删除学生\n3.查找学生\n4.修改学生信息\n5.录入学生成绩\n6.重置学生密码\n7.显示所有在读学生\n8.test显示休学学生\n9.解锁学生帐号\n10.登出帐号\n");
+			printf("1.添加学生\n2.删除学生\n3.查找学生\n4.修改学生信息\n5.录入学生成绩\n6.重置学生密码\n7.显示所有在读学生\n8.显示退学学生\n9.解锁学生帐号\n10.登出帐号\n");
 			scanf("%d",&com);
 			switch(com)
 			{
@@ -401,6 +421,7 @@ void teacher_show()
 					break;
 				case 5:
 					puts("5");
+					add_grades();
 					break;
 				case 6:
 					puts("6");
@@ -426,6 +447,10 @@ void teacher_show()
 					puts("请重新选择操作");
 					break;
 			}
+			//按任意键继续
+			puts("按任意键继续\n");
+			stdin->_IO_read_ptr = stdin->_IO_read_end;
+			getch();
 		}	
 	}
 	
@@ -435,31 +460,34 @@ void student_show()
 	while(1)
 	{
 		int com=0;
+		system("clear");
 		while(com<1||com>5)
 		{
 			system("clear");
 			puts("请选择操作");	
-			printf("1.查询成绩\n2.显示排名\n3.查询个人信息\n4.修改密码\n5.登出帐号\n");
+			printf("1.查询成绩\n2.显示排名\n3.显示本次考试的详细情况\n4.查询个人信息\n5.修改密码\n6.登出帐号\n");
+			
 			scanf("%d",&com);
 			switch(com)
 			{
 				case 1:
-					puts("1");
 					show_score(myID);
 					break;
 				case 2:
-					puts("2");
 					show_rank(myID);
 					break;
 				case 3:
-					puts("3");
-					show_std_information(myID);
+					show_max(myID);
+					show_min(myID);
+					show_average(myID);
 					break;
 				case 4:
-					puts("4");
-					change_password(myID);
+					show_std_information(myID);
 					break;
 				case 5:
+					change_password(myID);
+					break;
+				case 6:
 					return;
 					break;
 				default:
@@ -467,6 +495,9 @@ void student_show()
 					stdin->_IO_read_ptr =stdin->_IO_read_end;
 					break;
 			}
+			puts("按任意键继续\n");
+			stdin->_IO_read_ptr = stdin->_IO_read_end;
+			getch();
 		}
 	}
 }
@@ -491,6 +522,7 @@ void end()
 		fprintf(students_account_wp,"%s %s %c %c\n",(sp+i)->id,(sp+i)->password,(sp+i)->is_locked,(sp+i)->attempt);
 		fprintf(students_info_wp,"%s %s %c %c\n",(sp+i)->id,(sp+i)->name,(sp+i)->gender,(sp+i)->is_out);
 	}
+
 	fclose(students_score_wp);
 	fclose(students_account_wp);
 	fclose(students_info_wp);
@@ -519,5 +551,4 @@ void end()
 	FILE* principle_account_wp=fopen("principle_account.txt","w");
 	fprintf(principle_account_wp,"%s %s %c\n",principle.id,principle.password,principle.attempt);
 	fclose(principle_account_wp);
-
 }

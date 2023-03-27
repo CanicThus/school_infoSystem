@@ -5,7 +5,38 @@
 #include<stdbool.h>
 #include"tools.h"
 #include"system.h"
+#include<openssl/md5.h>
+#include<unistd.h>
+#include <getch.h>
+char buf[33]={};
+void md5(char *data)
+{
+	unsigned char* temData =(unsigned char*)data;
+    unsigned char md[16];
+    printf("%s\n",temData);
+    int i;
+    for(int i=0;i<33;i++)
+    {
+    	buf[i]=0;
+    }
+    printf("%s\n",buf);
+    
+    char tmp[3]={};
+    MD5(temData,strlen(data),md);
+    for (i = 0; i < 16; i++){
+        sprintf(tmp,"%2.2x",md[i]);
+        strcat(buf,tmp);
+    }
+    printf("%s\n",buf);
+}
 
+void anykey_continue(void)
+{
+	puts("请按任意键继续...");
+
+	stdin->_IO_read_ptr = stdin->_IO_read_end;
+	getch();
+}
 void init_principle(void)
 {
 	// 导入校长帐号密码
@@ -13,7 +44,7 @@ void init_principle(void)
 	if(principle_account_rp==NULL)perror("fopen:");
 	fscanf(principle_account_rp,"%s %s %c",principle.id,principle.password,&principle.attempt);
 	fclose(principle_account_rp);
-	printf("%s %s %c",principle.id,principle.password,principle.attempt);
+	//printf("%s %s %c",principle.id,principle.password,principle.attempt);
 }
 
 void init_teacher(void)
@@ -121,12 +152,12 @@ void init_Total_txt(void)
 //	FILE* total_num_rp=fopen("src/total_num.txt","r");
 	if(total_num_rp==NULL) perror("fopen: ");
 	fscanf(total_num_rp,"%d %d",&Total,&Total_T);
-	printf("total=%d total_T=%d\n",Total,Total_T);
+	//printf("total=%d total_T=%d\n",Total,Total_T);
 	fclose(total_num_rp);
 }
 	
 
-//通过id定位堆内存的位置 RC
+//通过id定位堆内存的学生位置 RC
 int find(char* id)
 {
 	for(int i=0;i<Total;i++)
@@ -138,6 +169,98 @@ int find(char* id)
 	}
 	return -1;
 }
+//通过id定位堆内存的教师位置 RC
+int find_t(char* id)
+{
+	for(int i=0;i<Total_T;i++)
+	{
+		if(strcmp(id,((tp+i)->id))==0)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+
+void change_password_t(char* id)
+{
+	char newkey[20]={};
+	char oldkey[20]={};
+	char* temp_password= getpass("请输入旧密码: ");
+	
+	strcpy(oldkey,temp_password);
+	md5(oldkey);
+	printf("%s\n1\n",oldkey);
+	if(0==strcmp(buf,(tp+find_t(id))->password))
+	{
+		char newkey1[20]={};
+		char* temp_password1= getpass("请输入新密码:");
+		strcpy(newkey1,temp_password1);
+		printf("\n");
+		char* temp_password2= getpass("请第二次输入新密码:");
+		strcpy(newkey,temp_password2);
+		printf("\n");
+		if(strcmp(newkey,newkey1)==0)
+		{
+			md5(newkey);
+			strcpy((tp+find_t(id))->password,buf);
+			printf("密码修改成功!\n");
+			return;
+		}
+		else
+		{
+			printf("密码与第一次输入的不一致\n");
+			return;
+		}
+	}
+	else
+	{
+		puts("密码输入错误!");
+		return;
+	}
+	return;
+}
+
+void change_password_p(char* id)
+{
+	char newkey[20]={};
+	char oldkey[20]={};
+	char* temp_password= getpass("请输入旧密码: ");
+	strcpy(oldkey,temp_password);
+	printf("\n");
+	md5(oldkey);
+	if(0==strcmp(buf,principle.password))
+	{
+		char newkey1[20]={};
+		char* temp_password1= getpass("请输入新密码:");
+		strcpy(newkey1,temp_password1);
+		printf("\n");
+		char* temp_password2= getpass("请第二次输入新密码:");
+		strcpy(newkey,temp_password2);
+		printf("\n");
+		if(strcmp(newkey,newkey1)==0)
+		{
+			md5(newkey);			
+			strcpy(principle.password,buf);
+			printf("密码修改成功!\n");
+		}
+		else
+		{
+			printf("密码与第一次输入的不一致\n");
+			return;
+		}
+
+		return;
+	}
+	else
+	{
+		puts("密码输入错误!");
+		return;
+	}
+	return;
+}
+
 
 char* generate_id(char* ID)
 {	
@@ -174,7 +297,8 @@ char* generate_id(char* ID)
 bool is_first_login(char* password)
 {
 	printf("%s\n",password);
-	if(strcmp(password,"000")==0)
+	md5("000");
+	if(strcmp(password,buf)==0)
 	{
 		printf("第一次登录，请重置密码\n");
 		return true;
@@ -185,7 +309,8 @@ bool is_first_login(char* password)
 void rest_passward(char* id)
 {
 	if(strcmp(sp->id,id)==0)
-	strcpy(sp->password,"000");
+	md5("000");
+	strcpy(sp->password,buf);
 }
 
 
@@ -210,12 +335,14 @@ char* generate_id_t(char* ID)
 	while(1)
 	{	int id=0;
 		int a=0;
+		char ID_T[]="00000000";//定义一个初始数组存储随机产生的数字
 		for(int i=0;i<8;i++)
 		{
 			id=id*10+rand()%9+1;
 		}
-		sprintf(ID,"%d",id);
-
+		sprintf(ID_T,"%d",id);
+		strcpy(ID,"T");//教师工号第一个位是T
+		strcat(ID,ID_T);//在T的后面加上随机产生的数字
 		for(int i =0;i<Total_T;i++)
 		{	
 			
@@ -240,7 +367,8 @@ char* generate_id_t(char* ID)
 bool is_first_login_t(char* password)
 {
 	printf("%s\n",password);
-	if(strcmp(password,"000")==0)
+	md5("000");
+	if(strcmp(password,buf)==0)
 	{
 		printf("第一次登录，请重置密码\n");
 		return true;
@@ -251,7 +379,8 @@ bool is_first_login_t(char* password)
 void rest_passward_t(char* id)
 {
 	if(strcmp(tp->id,id)==0)
-	strcpy(tp->password,"000");
+	md5("000");
+	strcpy(tp->password,buf);
 }
 
 
@@ -269,7 +398,7 @@ bool unlock_t(char* id)
 
 void change_name(char *p)//修改学生姓名
 {
-	char ch_name[9]={};
+	char ch_name[128]={};
 	int a=0;
 	printf("1、输入姓名\n2、取消修改\n");
 	
@@ -279,13 +408,19 @@ void change_name(char *p)//修改学生姓名
 		if(a==1)
 		{
 			printf("输入姓名\n");
-			scanf(" %s",ch_name);
+			stdin->_IO_read_ptr =stdin->_IO_read_end;
+			scanf("%s",ch_name);
 			strcpy(p,ch_name);
 			return;
 		}
 		else if(a==2)
 		{
 			return;
+		}
+		else
+		{
+			printf("选择模式有误，请重新选择修改成绩或者退出\n");
+			a=0;
 		}
 	}
 }
@@ -316,16 +451,28 @@ void change_gender(char *p)
 void change_math(int *p)
 {
 	int ch_math=0;
-	int a=0;
-	printf("1、修改数学成绩\n2、取消修改\n");
+	int a=0;//用于选择模式
+	printf("1、修改数学成绩\n2、退出修改\n");
 	
 	while(a<1||a>2)
 	{
 		scanf("%d",&a);
 		if(a==1)
 		{
-			printf("输入数学成绩\n");
-			scanf("%d",&ch_math);
+			while(1)
+			{
+				printf("输入数学成绩0~150\n");
+				scanf("%d",&ch_math);
+				if(ch_math>0&&ch_math<150)
+				{
+					break;	
+				}
+				else
+				{
+					printf("输入成绩有误，请重新输入0~150\n");
+				}
+			}
+			
 			*p=ch_math;
 			return;
 		}
@@ -333,21 +480,37 @@ void change_math(int *p)
 		{
 			return;
 		}
+		else
+		{
+			printf("选择模式有误，请重新选择修改成绩或者退出\n");
+			a=0;
+		}
 	}
 }
 void change_english(int *p)
 {
 	int ch_english=0;
 	int a=0;
-	printf("1、修改数学成绩\n2、取消修改\n");
+	printf("1、修改英语成绩\n2、取消修改\n");
 	
 	while(a<1||a>2)
 	{
 		scanf("%d",&a);
 		if(a==1)
 		{
-			printf("输入英语成绩\n");
-			scanf("%d",&ch_english);
+			while(1)
+			{
+				printf("输入英语成绩0~150\n");
+				scanf("%d",&ch_english);
+				if(ch_english>0&&ch_english<150)
+				{
+					break;	
+				}
+				else
+				{
+					printf("输入成绩有误，请重新输入0~150\n");
+				}
+			}
 			*p=ch_english;
 			return;
 		}
@@ -355,27 +518,48 @@ void change_english(int *p)
 		{
 			return;
 		}
+		else
+		{
+			printf("选择模式有误，请重新选择修改成绩或者退出\n");
+			a=0;
+		}
 	}
 }
 void change_chinese(int *p)
 {
 	int ch_chinese=0;
 	int a=0;
-	printf("1、修改数学成绩\n2、取消修改\n");
+	printf("1、修改语文成绩\n2、取消修改\n");
 	
 	while(a<1||a>2)
 	{
 		scanf("%d",&a);
 		if(a==1)
 		{
-			printf("输入英语成绩\n");
-			scanf("%d",&ch_chinese);
+			while(1)
+			{
+				printf("输入语文成绩0~150\n");
+				scanf("%d",&ch_chinese);
+				if(ch_chinese>0&&ch_chinese<150)
+				{
+					break;	
+				}
+				else
+				{
+					printf("输入成绩有误，请重新输入0~150\n");
+				}
+			}
 			*p=ch_chinese;
 			return;
 		}
 		else if(a==2)
 		{
 			return;
+		}
+		else
+		{
+			printf("选择模式有误，请重新选择修改成绩或者退出\n");
+			a=0;
 		}
 	}
 }
@@ -400,13 +584,6 @@ void change_isout(char *p)
 	}
 	
 }
-
-
-
-
-
-
-
 
 
 

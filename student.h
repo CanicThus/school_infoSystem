@@ -10,6 +10,9 @@ int rank_math(char* id);
 int rank_english(char* id);
 int rank_all(char* id);
 void show_rank();
+void show_min();
+void show_max();
+void show_average();
 void show_std_information(char* id);//显示学生信息
 void change_password(char* id);
 #endif
