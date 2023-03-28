@@ -5,7 +5,7 @@ FLAG=-Wall -Werror
 
 all:$(OBJ)
 	$(CC) -o $(BIN) $(OBJ) -lcrypto
-main.o:main.c tools.h system.h principle.h student.h teacher.h
+main.o:main.c system.h 
 	$(CC) -c main.c $(FLAG)
 system.o:system.c tools.h system.h principle.h student.h teacher.h
 	$(CC) -c system.c $(FLAG)
