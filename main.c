@@ -5,7 +5,7 @@
 int main()
 {
 	init();
-	//test();
-	start();
+	//init_md5();
+	show();
 	end();
 }

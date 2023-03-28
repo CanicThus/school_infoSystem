@@ -20,7 +20,7 @@ int Total_T=-1;// teachers' total number
 
 
 //for test and first ENmd5
-void test()
+void init_md5()
 {	
 	//教师密码初始化md5
 	for(int i=0;i<Total;i++)
@@ -326,10 +326,7 @@ void certify_std()
 	anykey_continue();
 	return ;
 }
-void start()
-{
-		show();			
-}
+
 
 void principle_show()
 {
