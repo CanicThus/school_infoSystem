@@ -6,12 +6,12 @@
 #include"tools.h"
 #include"system.h"
 #include"teacher.h"
-//添加学生
-Student *p=NULL;
+
+Student *p=NULL;//添加学生时申请新的堆内存
 static int total=0;//要导入的总人数
 void add_std()//
 {
-	char ID[]="00000000000000";
+	char ID[]="00000000000000";//用于传参，给一个学生学号
 	printf("1、只输入一个学生\n2、从文件中批量导入\n");
 	int com_a=0;//选择输入模式
 	FILE* students_info_ap=fopen("students_info.txt","a");//追加写学生的基本信息
@@ -25,16 +25,42 @@ void add_std()//
 	{
 
 		p=malloc(sizeof(Student));
-		char arr[256]={};
-		char sex_s='0';
+		char arr[256]={};//用于输入学生姓名
+		char sex_s='0';//用于输入学生性别
 		strcpy(p->id,generate_id(ID));
 		printf("请输入学生姓名\n");
-		scanf("%s",arr);
-		stdin->_IO_read_ptr = stdin->_IO_read_end;
-		printf("请输入学生性别\n");
-		scanf("%c",&sex_s);
-		stdin->_IO_read_ptr = stdin->_IO_read_end;
+		while(1)
+		{	
+			scanf("%s",arr);
+			stdin->_IO_read_ptr = stdin->_IO_read_end;
+			if(strlen(arr)<=19&&strlen(arr)>0)//限制学生名字长度（因为结构体中name数组为20）
+			{
+				break;
+			}
+			else
+			{
+				printf("输入错误，请重新输入姓名\n");
+			}
+		}
 		
+		stdin->_IO_read_ptr = stdin->_IO_read_end;
+		printf("请输入学生性别,F或者M\n");//限制性别输入，只能是F M （女 男）
+		while(1)
+		{	
+			scanf("%c",&sex_s);
+			stdin->_IO_read_ptr = stdin->_IO_read_end;
+			if(sex_s=='F'||sex_s=='M')
+			{
+				break;
+			}
+			else
+			{
+				printf("输入错误，请重新输入性别\n");
+			}
+		}
+		
+		
+		//堆内存中新学生信息
 		strcpy(p->name,arr);
 		md5("000");
 		strcpy(p->password,buf);
@@ -49,12 +75,13 @@ void add_std()//
 		fprintf(students_info_ap,"%s %s %c %c\n",p->id,p->name,p->gender,p->is_out);//写入基本信息到文件中
 		fprintf(students_account_ap,"%s %s %c %c\n",p->id,p->password,p->is_locked,p->attempt);//写入初始密码到文件中
 		fprintf(students_score_ap,"%s %d %d %d\n",p->id,p->chinese,p->math,p->english);//写入初始成绩到文件中
-		printf("id=%s gender=%c name=%s  password=%s is_locked=%c is_out=%c\n----\n",p->id,p->gender,p->name,p->password,p->is_locked,p->is_out);
+		printf("一名学生添加成功,以下为新学生信息\n");
+		printf("id=%s gender=%c name=%s  is_locked=%c is_out=%c\n----\n",p->id,p->gender,p->name,p->is_locked,p->is_out);
 		fclose(students_info_ap);
 		fclose(students_score_ap);
 		fclose(students_account_ap);
 		
-		Total++;
+		Total++;//对人数进行更新
 		FILE* total_num_wp=fopen("total_num.txt","w");
 		if(total_num_wp==NULL) perror("fopen: ");
 		fprintf(total_num_wp,"%d %d",Total,Total_T);
@@ -71,6 +98,7 @@ void add_std()//
 		
 		printf("请输入要导入的总人数\n");
 		scanf("%d",&total);		
+		printf("%d个学生添加成功,以下为新学生信息\n",total);
 		for(int i=0;i<total;i++)
 		{
 			p=malloc(sizeof(Student));	
@@ -100,22 +128,23 @@ void add_std()//
 		fclose(total_num_wp);
 		
 	}
+	anykey_continue();
 	free(sp);
 	free(tp);
 	free(p);
 	p=NULL;
 	tp=NULL;
 	sp=NULL;
-	init();
+	init();//添加完学生之后重新读取文件，更新堆内存中sp所指向的内容，用于之后显示学生也能显示新加的学生
 }
 
 
-//方法 删除学生
+//方法 删除学生，需要两次输入相同的学号
 void del_std()
 {
-	char del_id[128]={};
+	char del_id[128]={};//第一次输入的学号
 	char del_id1[128]={};//再次输入学号确定
-	int del=0;
+	int del=0;//用于选择模式1 2 按学号删除或者退出删除功能
 	
 	while(del<1||del>2)
 	{
@@ -146,6 +175,7 @@ void del_std()
 				del=0;
 				continue;
 			}
+			
 			if(strcmp(del_id,del_id1)==0)
 			{
 				for(int i=0;i<Total;i++)
@@ -154,13 +184,14 @@ void del_std()
 					{
 						(sp+i)->is_out='1';
 						printf("已经删除学生:%s %s\n",(sp+i)->id,(sp+i)->name);
+						anykey_continue();
 						return;
 					}
 				}
 			}
 			else
 			{
-				printf("两次学号输入不一致，请重新输入或瑞出\n");
+				printf("两次学号输入不一致，请重新输入或退出\n");
 				del=0;
 				continue;
 			}
@@ -172,15 +203,16 @@ void del_std()
 		}
 		else
 		{
-			printf("请输入1、2，选择输入或退出\n");
+			printf("请重新输入\n");
 			continue;
 		}
 
 	}
+	anykey_continue();
 }
 void search_std()//查找学生
 {
-	int search=0;
+	int search=0;//用于输入查找模式
 	system("clear");
 	
 	while(search<1||search>2)
@@ -197,33 +229,47 @@ void search_std()//查找学生
 }
 void search_std_id()//按照学生ID查找信息
 {
-	char std_id[9]={};
+	char std_id[128]={};//要查找到学生id
+	int flag=0;//用于是否找到该学生到标志
 	printf("请输入要查找的学生学号\n");
 	scanf("%s",std_id);
 	for(int i=0;i<Total;i++)
 	{	
 		if(strcmp(std_id,(sp+i)->id)==0)
 		{
-			printf("学号    性别 姓名   语文 数学 英语 密码 是否冻结 \n----\n");
-			printf("%s %c %s %d %d %d %s %c\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english,(sp+i)->password,(sp+i)->is_locked);
+			flag=1;
+			printf("学号     性别 姓名   语文 数学 英语 是否冻结 \n----\n");
+			printf("%s %c   %s %d %d %d %c\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english,(sp+i)->is_locked);
 			break;
 		}
 	}
+	if(flag==0)
+	{
+		printf("不存在该学号\n");;
+	}
+	flag=0;
 	anykey_continue();
 }
 void search_std_name()//按照学生姓名查找信息
 {
 	char std_name[20]={};
+	int flag=0;//用于是否找到该学生到标志
 	printf("请输入要查找的学生姓名\n");
 	scanf("%s",std_name);
 	for(int i=0;i<Total;i++)
 	{	
 		if(strcmp(std_name,(sp+i)->name)==0)
 		{
-			printf("学号    性别 姓名   语文 数学 英语 密码 是否冻结 \n----\n");
-			printf("%s %c %s %d %d %d %s %c\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english,(sp+i)->password,(sp+i)->is_locked);
+			flag=1;
+			printf("学号     性别 姓名   语文 数学 英语 是否冻结 \n----\n");
+			printf("%s %c   %s %d %d %d %c\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english,(sp+i)->is_locked);
 		}
 	}
+	if(flag==0)
+	{
+		printf("不存在该姓名\n");
+	}
+	flag=0;
 	anykey_continue();
 }
 
@@ -231,7 +277,7 @@ void search_std_name()//按照学生姓名查找信息
 
 void change_stdinfo()//修改学生信息
 {
-	int change=0;
+	int change=0;//用于选择修改模式
 	system("clear");
 	
 	while(change<1||change>2)
@@ -250,13 +296,16 @@ void change_stdinfo()//修改学生信息
 
 void change_stdinfo_id()//按照学生ID修改信息
 {
-	char change_id[9]={};
+	char change_id[128]={};
 	printf("请输入要修改的学生学号\n");
 	scanf("%s",change_id);
+	stdin->_IO_read_ptr = stdin->_IO_read_end;
+	int flag=0;//用于判断是否找到该学生
 	for(int i=0;i<Total;i++)
 	{	
 		if(strcmp(change_id,(sp+i)->id)==0)
 		{
+			flag=1;
 			printf("学号    性别 姓名   语文 数学 英语 密码 是否冻结 \n----\n");
 			printf("%s %c %s %d %d %d %s %c\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english,(sp+i)->password,(sp+i)->is_locked);
 			
@@ -266,6 +315,7 @@ void change_stdinfo_id()//按照学生ID修改信息
 			{
 				printf("请选择要修改的内容\n1、姓名\n2、性别\n3、语文成绩\n4、数学成绩\n5、英语成绩\n6、是否离校\n");
 				scanf("%d",&ch);
+				stdin->_IO_read_ptr = stdin->_IO_read_end;
 				switch(ch)
 				{
 					case 1:change_name(&(sp+i)->name);break;
@@ -281,16 +331,25 @@ void change_stdinfo_id()//按照学生ID修改信息
 			
 		}
 	}
+	if(flag==0)
+	{
+		printf("不存在该id,无法修改\n");
+	}
+	flag=0;
+	anykey_continue();
 }
 void change_stdinfo_name()//按照学生姓名修改信息
 {
-	char change_n[20]={};
+	char change_n[128]={};
 	printf("请输入要修改的学生姓名\n");
 	scanf("%s",change_n);
+	stdin->_IO_read_ptr = stdin->_IO_read_end;
+	int flag=0;
 	for(int i=0;i<Total;i++)
 	{	
 		if(strcmp(change_n,(sp+i)->name)==0)
 		{
+			flag=1;
 			printf("学号    性别 姓名   语文 数学 英语 密码 是否冻结 \n----\n");
 			printf("%s %c %s %d %d %d %s %c\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english,(sp+i)->password,(sp+i)->is_locked);
 			
@@ -315,6 +374,12 @@ void change_stdinfo_name()//按照学生姓名修改信息
 			
 		}
 	}
+	if(flag==0)
+	{
+		printf("不存在该姓名,无法修改\n");
+	}
+	flag=0;
+	anykey_continue();
 }
 
 void add_grades()//实质是对已经有的学生进行成绩修改，寻找学号进行单个修改或者多个依次修改
@@ -330,13 +395,15 @@ void add_grades()//实质是对已经有的学生进行成绩修改，寻找学�
 		{
 		fscanf(students_score_rp,"%s %s %c %c",(sp+i)->id,(sp+i)->name,&(sp+i)->gender,&(sp+i)->is_out);	
 		}
-		char add_id[9]={};
+		char add_id[128]={};
 		printf("请输入要修改成绩的学生学号\n");
 		scanf("%s",add_id);
+		int flag=0;
 		for(int i=0;i<Total;i++)
 		{	
 			if(strcmp(add_id,(sp+i)->id)==0)
 			{
+				flag=1;
 				printf("学号   姓名   语文 数学 英语 \n\n");
 				printf("%s %s %d %d %d\n",(sp+i)->id,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english);
 			
@@ -357,14 +424,18 @@ void add_grades()//实质是对已经有的学生进行成绩修改，寻找学�
 					}
 				
 				}
-			
+				//重新写入成绩到文件中
+				fprintf(students_score_rp,"%s %d %d %d",(sp+i)->id,(sp+i)->chinese,(sp+i)->math,(sp+i)->english);
+				printf("modified successfully\n");
 			}
-			//重新写入成绩到文件中
-			fprintf(students_score_rp,"%s %d %d %d",(sp+i)->id,(sp+i)->chinese,(sp+i)->math,(sp+i)->english);
+			
 		}
-		
+		if(flag==0)
+		{
+			printf("不存在该学生,无法导入成绩\n");
+		}
+		flag=0;
 		fclose(students_score_wp);
-		printf("modified successfully\n");
 		anykey_continue();
 		
 	}
@@ -407,23 +478,27 @@ void add_grades()//实质是对已经有的学生进行成绩修改，寻找学�
 	init();
 }
 
-
-
-
-
-
-
-
-
-
-
 //方法 解锁
 void unlock_std()
 {
-	char unlock_id[9]={};
+	char unlock_id[128]={};
 	printf("请输入要解锁的学生学号\n");
+	while(1)
+	{
+		scanf("%s",unlock_id);
+		if(strlen(unlock_id)<9&&strlen(unlock_id)>0)
+		{
+			break;
+		}
+		else
+		{
+			printf("输入错误，请重新输入id\n");
+			
+		}
+	}
 	scanf("%s",unlock_id);
-	for(int i=0;i<Total;i++)
+	int i=0;
+	for(i=0;i<Total;i++)
 	{	
 		if(strcmp(unlock_id,(sp+i)->id)==0)
 		{
@@ -433,6 +508,12 @@ void unlock_std()
 			anykey_continue();
 			return;
 		}
+	}
+	if(i==Total)
+	{
+		printf("要解锁的id不存在\n");
+		anykey_continue();
+		return;
 	}
 }
 
@@ -448,7 +529,8 @@ void reset_password()
 	{	
 		if(strcmp(reset_id,(sp+i)->id)==0)
 		{
-			strcpy((sp+i)->password,"000");
+			md5("000");
+			strcpy((sp+i)->password,buf);
 			printf("\n重置成功\n");
 			anykey_continue();
 			return;
@@ -465,22 +547,22 @@ void reset_password()
 //方法 显示所有在校学生
 void list_all_std()
 {
-	printf("学号    性别 姓名   语文 数学 英语 密码 是否冻结 \n----\n");
+	printf("学号     性别 姓名   语文 数学 英语 是否冻结 \n----\n");
 	for(int i=0;i<Total;i++)
 	{	
 		if((sp+i)->is_out=='0')
-		printf("%s %c %s %d %d %d %s %c\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english,(sp+i)->password,(sp+i)->is_locked);
+		printf("%s %c   %s %d %d %d %c\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english,(sp+i)->is_locked);
 	}
 	anykey_continue();
 }
 //方法 显示退学学生
 void list_out_std()
 {
-	printf("学号    性别 姓名   语文 数学 英语  密码\n----\n");
+	printf("学号    性别 姓名   语文 数学 英语  \n----\n");
 	for(int i=0;i<Total;i++)
 	{	
 		if((sp+i)->is_out=='1')
-		printf("%8s %8c %8s  %8d  %8d  %8d  %s\n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english,(sp+i)->password);
+		printf("%8s %8c %8s  %8d  %8d  %8d \n",(sp+i)->id,(sp+i)->gender,(sp+i)->name,(sp+i)->chinese,(sp+i)->math,(sp+i)->english);
 	}
 	anykey_continue();
 }

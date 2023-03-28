@@ -14,18 +14,9 @@ Student *sp=NULL;
 Teacher *tp=NULL;
 Principle principle={};
 
-char myID[10]={};
-int Total=-1;
-int Total_T=-1;
-int CH_max=-1;
-int CH_min=-1;
-int CH_avg=-1;
-int Math_max=-1;
-int EN_max=-1;
-int EN_min=-1;
-int EN_avg=-1;
-int Math_min=-1;
-int Math_avg=-1;
+char myID[10]={};//id of logined account
+int Total=-1;// students total number
+int Total_T=-1;// teachers' total number
 
 
 //for test and first ENmd5
@@ -81,21 +72,18 @@ void show()
 		for(;com<1||com>4;)
 		{
 			system("clear");
-			printf("请选择登入类型\n");
+			printf("******请选择登入类型******\n");
 			printf("1.学生登入\n2.教师登入\n3.校长登入\n4.退出\n");
 			scanf("%d",&com);
 			switch(com)
 			{
 				case 1:
-					puts("1");
 					certify_std();
 					break;
 				case 2:
-					puts("2");
 					certify_teacher();
 					break;
 				case 3:
-					puts("3");
 					certify_principle();
 					break;
 				case 4:
@@ -103,7 +91,7 @@ void show()
 					break;
 				default:
 					stdin->_IO_read_ptr =stdin->_IO_read_end;
-					puts("请重新选择登入类型");
+					puts("******请重新选择登入类型******");
 			}
 		}
 	}
@@ -137,6 +125,7 @@ void certify_principle()
 			if(principle.attempt=='3')
 			{
 				puts("该帐号已锁定");
+				anykey_continue();
 				return;
 			}
 			principle.attempt++;
@@ -156,6 +145,7 @@ void certify_principle()
 			{
 				count++;
 				puts("帐号密码不一致，请重新输入\n");
+				
 			}
 		}
 		else
@@ -163,6 +153,7 @@ void certify_principle()
 			if(principle.attempt=='3')
 			{
 				puts("该帐号已锁定");
+				anykey_continue();
 				return;
 			}
 			count++;
@@ -172,7 +163,7 @@ void certify_principle()
 	}
 	
 	puts("输入错误超过三次\n");
-	
+	anykey_continue();
 	return ;
 }
 
@@ -208,6 +199,7 @@ void certify_teacher()
 				if((tp+i)->attempt=='3')
 				{
 					puts("该帐号已锁定");
+					anykey_continue();
 					return;
 				}
 				(tp+i)->attempt++;
@@ -217,6 +209,7 @@ void certify_teacher()
 					if((tp+i)->is_out=='1')
 					{
 						puts("该教师已离职");
+						anykey_continue();
 						return;
 					}
 					(tp+i)->attempt='0';
@@ -234,6 +227,7 @@ void certify_teacher()
 					if((tp+i)->attempt=='3')
 					{
 						puts("该帐号已锁定");
+						anykey_continue();
 						return;
 					}
 					count++;
@@ -249,6 +243,7 @@ void certify_teacher()
 		}	
 	}	
 	puts("输入错误超过三次\n");
+	anykey_continue();
 	return ;
 }
 
@@ -283,6 +278,7 @@ void certify_std()
 				if((sp+i)->attempt=='3')
 				{
 					puts("该帐号已锁定");
+					anykey_continue();
 					return;
 				}
 				(sp+i)->attempt++;
@@ -292,6 +288,7 @@ void certify_std()
 					if((sp+i)->is_out=='1')
 					{
 						puts("该学生已休学");
+						anykey_continue();
 						return;
 					}
 					(sp+i)->attempt='0';
@@ -310,6 +307,7 @@ void certify_std()
 					if((sp+i)->attempt=='3')
 					{
 						puts("该帐号已锁定");
+						anykey_continue();
 						return;
 					}
 					puts("帐号密码不一致，请重新输入\n");
@@ -325,6 +323,7 @@ void certify_std()
 	}
 	
 	puts("输入错误超过三次\n");
+	anykey_continue();
 	return ;
 }
 void start()
@@ -341,41 +340,33 @@ void principle_show()
 		while(com<1||com>9)
 		{
 			system("clear");
-			puts("请选择操作");	
+			puts("******请选择操作******");	
 			printf("1.重置校长密码\n2.重置教师密码\n3.添加教师\n4.删除教师\n5.显示在职教师\n6.显示离职教师\n7.解锁教师帐号\n8.修改校长密码\n9.登出帐号\n");
 			scanf("%d",&com);
 			switch(com)
 			{
 				case 1:
-					puts("1");
 					reset_password_P();
 					break;
 				case 2:
-					puts("2");
 					reset_password_T();
 					break;
 				case 3:
-					puts("3");
 					add_T();
 					break;
 				case 4:
-					puts("4");
 					del_T();
 					break;
 				case 5:
-					puts("5");
 					list_all_T();
 					break;
 				case 6:
-					puts("6");
 					list_out_T();
 					break;
 				case 7:
-					puts("7");
 					unlock_T();
 					break;
 				case 8:
-					puts("8");
 					change_password_p(principle.password);
 					break;
 				case 9:
@@ -398,45 +389,36 @@ void teacher_show()
 		while(com<1||com>10)
 		{	
 			system("clear");
-			puts("请选择操作");	
+			puts("******请选择操作******");	
 			printf("1.添加学生\n2.删除学生\n3.查找学生\n4.修改学生信息\n5.录入学生成绩\n6.重置学生密码\n7.显示所有在读学生\n8.显示退学学生\n9.解锁学生帐号\n10.登出帐号\n");
 			scanf("%d",&com);
 			switch(com)
 			{
 				case 1:
-					puts("1");
 					add_std();
 					break;
 				case 2:
-					puts("2");
 					del_std();
 					break;
 				case 3:
-					puts("3");
 					search_std();
 					break;
 				case 4:
-					puts("4");
 					 change_stdinfo();
 					break;
 				case 5:
-					puts("5");
 					add_grades();
 					break;
 				case 6:
-					puts("6");
 					reset_password();
 					break;
 				case 7:
-					puts("7");
 					list_all_std();
 					break;
 				case 8:
-					puts("8");
 					list_out_std();
 					break;
 				case 9:
-					puts("9");
 					unlock_std();
 					break;
 				case 10:
@@ -447,10 +429,6 @@ void teacher_show()
 					puts("请重新选择操作");
 					break;
 			}
-			//按任意键继续
-			puts("按任意键继续\n");
-			stdin->_IO_read_ptr = stdin->_IO_read_end;
-			getch();
 		}	
 	}
 	
@@ -464,7 +442,7 @@ void student_show()
 		while(com<1||com>5)
 		{
 			system("clear");
-			puts("请选择操作");	
+			puts("******请选择操作******");	
 			printf("1.查询成绩\n2.显示排名\n3.显示本次考试的详细情况\n4.查询个人信息\n5.修改密码\n6.登出帐号\n");
 			
 			scanf("%d",&com);
@@ -480,6 +458,7 @@ void student_show()
 					show_max(myID);
 					show_min(myID);
 					show_average(myID);
+					anykey_continue();
 					break;
 				case 4:
 					show_std_information(myID);
@@ -495,9 +474,6 @@ void student_show()
 					stdin->_IO_read_ptr =stdin->_IO_read_end;
 					break;
 			}
-			puts("按任意键继续\n");
-			stdin->_IO_read_ptr = stdin->_IO_read_end;
-			getch();
 		}
 	}
 }
@@ -527,13 +503,13 @@ void end()
 	fclose(students_account_wp);
 	fclose(students_info_wp);
 	
-	//MAX，IMN，AVG写入文件
+	/*//MAX，IMN，AVG写入文件
 	FILE* scores_wp=fopen("scores.txt","w");
 	fprintf(scores_wp,"%d %d %d\n",CH_max,CH_min,CH_avg);
 	fprintf(scores_wp,"%d %d %d\n",Math_max,Math_min,Math_avg);
 	fprintf(scores_wp,"%d %d %d\n",EN_max,EN_min,EN_avg);
 	fclose(scores_wp);
-	
+	*/
 	//堆内存教师信息写入文件
 	FILE* teacher_info_wp=fopen("teacher_info.txt","w");
 	FILE* teacher_account_wp=fopen("teacher_account.txt","w");
@@ -551,4 +527,10 @@ void end()
 	FILE* principle_account_wp=fopen("principle_account.txt","w");
 	fprintf(principle_account_wp,"%s %s %c\n",principle.id,principle.password,principle.attempt);
 	fclose(principle_account_wp);
+	
+	//free
+	free(sp);
+	sp=NULL;
+	free(tp);
+	tp=NULL;
 }

@@ -41,7 +41,7 @@ int getscore_english(char* id)//获取学生英语成绩的函数
 	return -1;
 }
 
-void show_score(char* id)
+void show_score(char* id)//显示成绩
 {
 	printf("语文成绩：%d\n",getscore_chinese(id));
 	printf("数学成绩：%d\n",getscore_math(id));
@@ -124,7 +124,7 @@ int rank_all(char* id)//排名函数，需要给它一个id，返回一个排名
 	return num;
 }
 
-void show_rank(char* id)
+void show_rank(char* id)//显示排名
 {
 	printf("语文成绩排名：%d\n",rank_chinese(id));
 	printf("数学成绩排名：%d\n",rank_math(id));
@@ -134,7 +134,7 @@ void show_rank(char* id)
 }
 
 
-void show_std_information(char* id)
+void show_std_information(char* id)//显示学生信息
 {
 	printf("学号:%s\n",id);
 	for(int i=0;i<Total;i++)
@@ -155,7 +155,7 @@ void show_std_information(char* id)
 	return;
 }
 
-void change_password(char* id)
+void change_password(char* id)//修改学生密码
 {
 	char newkey[20]={};
 	char oldkey[20]={};
@@ -177,23 +177,26 @@ void change_password(char* id)
 			md5(newkey);
 			strcpy((sp+find(id))->password,buf);
 			printf("密码修改成功!\n");
+			anykey_continue();
 			return;
 		}
 		else
 		{
 			printf("密码与第一次输入的不一致\n");
+			anykey_continue();
 			return;
 		}
 	}
 	else
 	{
 		puts("密码输入错误!");
+		anykey_continue();
 		return;
 	}
 	return;
 }
 
-void show_max()
+void show_max()//显示各科的最高成绩
 {
 	int max_e=sp->english;
 	int max_m=sp->math;
@@ -223,7 +226,7 @@ void show_max()
 	return;
 }
 
-void show_min()
+void show_min()//显示各科最低成绩
 {
 	int min_e=sp->english;
 	int min_m=sp->math;
@@ -253,7 +256,7 @@ void show_min()
 	return;
 }
 
-void show_average()
+void show_average()//计算平均分
 {
 	float average_c=0;
 	float average_m=0;

@@ -13,13 +13,13 @@ void md5(char *data)
 {
 	unsigned char* temData =(unsigned char*)data;
     unsigned char md[16];
-    printf("%s\n",temData);
+   // printf("%s\n",temData);
     int i;
     for(int i=0;i<33;i++)
     {
     	buf[i]=0;
     }
-    printf("%s\n",buf);
+   // printf("%s\n",buf);
     
     char tmp[3]={};
     MD5(temData,strlen(data),md);
@@ -27,7 +27,7 @@ void md5(char *data)
         sprintf(tmp,"%2.2x",md[i]);
         strcat(buf,tmp);
     }
-    printf("%s\n",buf);
+    //printf("%s\n",buf);
 }
 
 void anykey_continue(void)
@@ -115,11 +115,11 @@ void init_stu(void)
 		}
 	}
 	
-	//读入各科成绩MAX，MIN，AVG
+/*	//读入各科成绩MAX，MIN，AVG
 	fscanf(scores_rp,"%d %d %d",&CH_max,&CH_min,&CH_avg);
 	fscanf(scores_rp,"%d %d %d",&Math_max,&Math_min,&Math_avg);
 	fscanf(scores_rp,"%d %d %d",&EN_max,&EN_min,&EN_avg);
-		
+		*/
 
 	
 	//根据相同id写入帐号密码是否锁定,尝试登入次数
@@ -191,7 +191,7 @@ void change_password_t(char* id)
 	
 	strcpy(oldkey,temp_password);
 	md5(oldkey);
-	printf("%s\n1\n",oldkey);
+	//printf("%s\n1\n",oldkey);
 	if(0==strcmp(buf,(tp+find_t(id))->password))
 	{
 		char newkey1[20]={};
@@ -206,17 +206,20 @@ void change_password_t(char* id)
 			md5(newkey);
 			strcpy((tp+find_t(id))->password,buf);
 			printf("密码修改成功!\n");
+			anykey_continue();
 			return;
 		}
 		else
 		{
 			printf("密码与第一次输入的不一致\n");
+			anykey_continue();
 			return;
 		}
 	}
 	else
 	{
 		puts("密码输入错误!");
+		anykey_continue();
 		return;
 	}
 	return;
@@ -244,10 +247,13 @@ void change_password_p(char* id)
 			md5(newkey);			
 			strcpy(principle.password,buf);
 			printf("密码修改成功!\n");
+			anykey_continue();
+			
 		}
 		else
 		{
 			printf("密码与第一次输入的不一致\n");
+			anykey_continue();
 			return;
 		}
 
@@ -256,6 +262,7 @@ void change_password_p(char* id)
 	else
 	{
 		puts("密码输入错误!");
+		anykey_continue();
 		return;
 	}
 	return;
@@ -291,12 +298,13 @@ char* generate_id(char* ID)
 			break;
 		}
 	}
+
 	return ID;
 }
 //判断是否是第一次登录，初始密码是否为000
 bool is_first_login(char* password)
 {
-	printf("%s\n",password);
+	//printf("%s\n",password);
 	md5("000");
 	if(strcmp(password,buf)==0)
 	{
@@ -366,7 +374,7 @@ char* generate_id_t(char* ID)
 //判断是否是第一次登录，初始密码是否为000
 bool is_first_login_t(char* password)
 {
-	printf("%s\n",password);
+	//printf("%s\n",password);
 	md5("000");
 	if(strcmp(password,buf)==0)
 	{
@@ -408,9 +416,21 @@ void change_name(char *p)//修改学生姓名
 		if(a==1)
 		{
 			printf("输入姓名\n");
-			stdin->_IO_read_ptr =stdin->_IO_read_end;
-			scanf("%s",ch_name);
+			while(1)
+			{
+				scanf("%s",ch_name);
+				stdin->_IO_read_ptr =stdin->_IO_read_end;
+				if(strlen(ch_name)<19&&strlen(ch_name)>0)
+				{
+					break;
+				}
+				else
+				{
+					printf("输入名字过长或过短，请重新输入\n");
+				}
+			}
 			strcpy(p,ch_name);
+			printf("修改成功\n");
 			return;
 		}
 		else if(a==2)
@@ -437,13 +457,33 @@ void change_gender(char *p)
 		if(a==1)
 		{
 			printf("请输入性别\n");
+			while(1)
+			{
+				scanf(" %c",&ch_gender);
+				stdin->_IO_read_ptr =stdin->_IO_read_end;
+				if(ch_gender=='F'&&ch_gender=='M')
+				{
+					break;
+				}
+				else
+				{
+					printf("输入性别错误，请重新输入\n");
+				}
+			}
+			
 			scanf(" %c",&ch_gender);
 			*p=ch_gender;
+			printf("修改成功\n");
 			return;
 		}
 		else if(a==2)
 		{
 			return;
+		}
+		else
+		{
+			printf("选择模式有误，请重新选择修改成绩或者退出\n");
+			a=0;
 		}
 	}
 	
@@ -474,6 +514,7 @@ void change_math(int *p)
 			}
 			
 			*p=ch_math;
+			printf("修改成功\n");
 			return;
 		}
 		else if(a==2)
@@ -512,6 +553,7 @@ void change_english(int *p)
 				}
 			}
 			*p=ch_english;
+			printf("修改成功\n");
 			return;
 		}
 		else if(a==2)
