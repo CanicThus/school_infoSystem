@@ -57,7 +57,7 @@ void init_teacher(void)
 	//puts("2xxxxxxxxxxxxxxxx");
 	for(int i=0;i<Total_T;i++)
 	{
-		fscanf(teacher_info_rp,"%s %s %c %c",(tp+i)->id,(tp+i)->name,&(tp+i)->gender,&(tp+i)->is_out);
+		fscanf(teacher_info_rp,"%s %s %s %c",(tp+i)->id,(tp+i)->name,(tp+i)->gender,&(tp+i)->is_out);
 	}
 	
 	
@@ -78,7 +78,7 @@ void init_teacher(void)
 	//puts("333333");
 	for(int i=0;i<Total_T;i++)
 	{
-		printf("id=%s name=%s password=%s\ngender=%c is_out=%c is_locked=%c\n",(tp+i)->id,(tp+i)->name,(tp+i)->password,(tp+i)->gender,(tp+i)->is_out,(tp+i)->is_locked);	
+		printf("id=%s name=%s password=%s\ngender=%s is_out=%c is_locked=%c\n",(tp+i)->id,(tp+i)->name,(tp+i)->password,(tp+i)->gender,(tp+i)->is_out,(tp+i)->is_locked);	
 	}
 	fclose(teacher_info_rp);
 	fclose(teacher_account_rp);
@@ -92,11 +92,10 @@ void init_stu(void)
 	FILE* students_score_rp=fopen("students_score.txt","r");
 	FILE* students_account_rp=fopen("students_account.txt","r");
 	FILE* students_info_rp=fopen("students_info.txt","r");
-	FILE* scores_rp=fopen("scores.txt","r");
 	sp=malloc(sizeof(Student)*Total);
 	for(int i=0;i<Total;i++)
 	{
-		fscanf(students_info_rp,"%s %s %c %c",(sp+i)->id,(sp+i)->name,&(sp+i)->gender,&(sp+i)->is_out);	
+		fscanf(students_info_rp,"%s %s %s %c",(sp+i)->id,(sp+i)->name,(sp+i)->gender,&(sp+i)->is_out);	
 	}
 	//puts("------");	
 	//根据相同id写入成绩
@@ -115,11 +114,6 @@ void init_stu(void)
 		}
 	}
 	
-/*	//读入各科成绩MAX，MIN，AVG
-	fscanf(scores_rp,"%d %d %d",&CH_max,&CH_min,&CH_avg);
-	fscanf(scores_rp,"%d %d %d",&Math_max,&Math_min,&Math_avg);
-	fscanf(scores_rp,"%d %d %d",&EN_max,&EN_min,&EN_avg);
-		*/
 
 	
 	//根据相同id写入帐号密码是否锁定,尝试登入次数
@@ -141,19 +135,25 @@ void init_stu(void)
 	fclose(students_account_rp);
 	fclose(students_score_rp);
 	fclose(students_info_rp);
-	fclose(scores_rp);
 }
 
 //读入总人数
 void init_Total_txt(void)
 {
-	FILE* total_num_rp=fopen("total_num.txt","r");
+	/*FILE* total_num_rp=fopen("total_num.txt","r");
 	//相对路径无法实现
 //	FILE* total_num_rp=fopen("src/total_num.txt","r");
 	if(total_num_rp==NULL) perror("fopen: ");
 	fscanf(total_num_rp,"%d %d",&Total,&Total_T);
 	//printf("total=%d total_T=%d\n",Total,Total_T);
-	fclose(total_num_rp);
+	fclose(total_num_rp);*/
+	FILE *students_info_rp=fopen("students_info.txt","r");
+	FILE* teacher_account_rp=fopen("teacher_account.txt","r");
+	if(students_info_rp==NULL)perror("fopen students_info.txt:");
+	Total=count_Total(students_info_rp);//fclose in count_Total
+	printf("Total=%d\n",Total);
+	Total_T=count_Total(teacher_account_rp);//fclose in count_Total
+	printf("Total_T=%d\n",Total_T);
 }
 	
 
@@ -269,36 +269,13 @@ void change_password_p(char* id)
 }
 
 
-char* generate_id(char* ID)
+char* generate_id(char* ID)//ID是全局变量id  老师和学生的要分开写两个全局变量，分别从0号开始
 {	
-	while(1)
-	{	int id=0;
-		int a=0;
-		for(int i=0;i<8;i++)
-		{
-			id=id*10+rand()%9+1;
-		}
-		sprintf(ID,"%d",id);
-
-		for(int i =0;i<Total;i++)
-		{	
-			
-			if(strcmp((sp+i)->id,ID)==0)
-			{
-				a=1;
-				break;
-			}
-			if(strcmp((sp+i)->id,ID)!=0)
-			{
-				a=0;
-			}
-		}
-		if(a==0)
-		{
-			break;
-		}
-	}
-
+		
+	int id=0;
+	id=atoi(ID);
+	id++;
+	sprintf(ID,"%08d",id);
 	return ID;
 }
 //判断是否是第一次登录，初始密码是否为000
@@ -338,37 +315,16 @@ bool unlock(char* id)
 
 
 
-char* generate_id_t(char* ID)
+char* generate_id_t(char* ID)//用于生成教师的ID 
 {	
-	while(1)
-	{	int id=0;
-		int a=0;
-		char ID_T[]="00000000";//定义一个初始数组存储随机产生的数字
-		for(int i=0;i<8;i++)
-		{
-			id=id*10+rand()%9+1;
-		}
-		sprintf(ID_T,"%d",id);
-		strcpy(ID,"T");//教师工号第一个位是T
-		strcat(ID,ID_T);//在T的后面加上随机产生的数字
-		for(int i =0;i<Total_T;i++)
-		{	
-			
-			if(strcmp((tp+i)->id,ID)==0)
-			{
-				a=1;
-				break;
-			}
-			if(strcmp((tp+i)->id,ID)!=0)
-			{
-				a=0;
-			}
-		}
-		if(a==0)
-		{
-			break;
-		}
-	}
+		
+	int id=0;
+	char tem_ID[10]="T";//需要T开头
+	id=atoi(ID);
+	id++;
+	sprintf(ID,"%08d",id);
+	strcat(tem_ID,ID);
+	strcpy(ID,tem_ID);
 	return ID;
 }
 //判断是否是第一次登录，初始密码是否为000
@@ -418,8 +374,8 @@ void change_name(char *p)//修改学生姓名
 			printf("输入姓名\n");
 			while(1)
 			{
-				scanf("%s",ch_name);
-				stdin->_IO_read_ptr =stdin->_IO_read_end;
+				fgets(ch_name,20,stdin);
+				discard_n(ch_name);
 				if(strlen(ch_name)<19&&strlen(ch_name)>0)
 				{
 					break;
@@ -447,7 +403,7 @@ void change_name(char *p)//修改学生姓名
 
 void change_gender(char *p)
 {
-	char ch_gender='0';
+	char ch_gender[128]={};
 	int a=0;
 	printf("1、修改性别\n2、取消修改\n");
 	
@@ -459,9 +415,9 @@ void change_gender(char *p)
 			printf("请输入性别\n");
 			while(1)
 			{
-				scanf(" %c",&ch_gender);
-				stdin->_IO_read_ptr =stdin->_IO_read_end;
-				if(ch_gender=='F'&&ch_gender=='M')
+				fgets(ch_gender,5,stdin);
+				discard_n(ch_gender);
+				if(strcmp(ch_gender,"女")==0||strcmp(ch_gender,"男")==0)
 				{
 					break;
 				}
@@ -471,8 +427,7 @@ void change_gender(char *p)
 				}
 			}
 			
-			scanf(" %c",&ch_gender);
-			*p=ch_gender;
+			strcpy(p,ch_gender);
 			printf("修改成功\n");
 			return;
 		}
@@ -627,8 +582,37 @@ void change_isout(char *p)
 	
 }
 
+bool discard_n(char* arr)//用于丢弃字符串中最后一个回车,并清理输入缓冲区
+{
+	if(arr[strlen(arr)-1]=='\n')
+	{
+		arr[strlen(arr)-1]='\0';
+		stdin->_IO_read_ptr = stdin->_IO_read_end;
+		return true;
+	}
+	stdin->_IO_read_ptr = stdin->_IO_read_end;
+	return false;	
+}
 
+int count_Total(FILE* fp)//用于计数文件中的学生数量
+{
+	int flag = 0, count = 0;
+	if(fp  == NULL)
+	return -1;
+	while(!feof(fp))
+	{
+		flag = fgetc(fp);
+		if(flag == '\n')
+		{
 
+			count++;
+		}
+	}
+	Total = count ; //加上最后一行
+	printf("row = %d\n", Total);
+	fclose(fp);
+	return Total;
+}
 
 
 

@@ -35,9 +35,9 @@ void change_english();
 void change_chinese();
 void change_isout();
 
+bool discard_n(char* arr);
 
-
-
+int count_Total(FILE* fp);
 
 
 

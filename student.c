@@ -148,7 +148,7 @@ void show_std_information(char* id)//显示学生信息
 	{
 		if(strcmp(id,((sp+i)->id))==0)
 		{
-			printf("性别:%c\n",(sp+i)->gender);
+			printf("性别:%s\n",(sp+i)->gender);
 		}
 	}
 	anykey_continue();

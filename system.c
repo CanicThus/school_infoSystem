@@ -17,7 +17,7 @@ Principle principle={};
 char myID[10]={};//id of logined account
 int Total=-1;// students total number
 int Total_T=-1;// teachers' total number
-
+char ID[10]={};
 
 //for test and first ENmd5
 void init_md5()
@@ -38,16 +38,7 @@ void init_md5()
 	md5(principle.password);
 	strcpy(principle.password,buf);
 	
-	/*CH_max=1;CH_min=1;CH_avg=1;
-	EN_max=1;EN_min=1;EN_avg=1;
-	Math_max=1;Math_min=1;Math_avg=1;
-	strcpy((sp+2)->name,"TEST");
-	strcpy((sp+2)->password,"TEST");
-	(sp+2)->gender='T';(sp+2)->is_locked='T';
-	(sp+2)->attempt='T';(sp+2)->is_out='T';
-	(sp+2)->chinese=1;(sp+2)->math=1;
-	(sp+2)->english=1;*/
-//	Total=1;Total_T=1;
+	
 }
 
 //导入文件数据到堆内存中
@@ -55,23 +46,25 @@ void init()
 {
 	
 	init_Total_txt();
-	
+	printf("%d",__LINE__);
 	init_stu();
-	
+	printf("%d",__LINE__);
 	init_teacher();
-	
+	printf("%d",__LINE__);
 	init_principle();
+	printf("%d",__LINE__);
 }
 
 void show()
 {	
 	while(1)
 	{
-		system("clear");
+		//system("clear");
 		int com=0;
 		for(;com<1||com>4;)
 		{
-			system("clear");
+			//system("clear");
+			printf("%d %d\n",Total,Total_T);
 			printf("******请选择登入类型******\n");
 			printf("1.学生登入\n2.教师登入\n3.校长登入\n4.退出\n");
 			scanf("%d",&com);
@@ -493,7 +486,7 @@ void end()
 	{
 		fprintf(students_score_wp,"%s %d %d %d\n",(sp+i)->id,(sp+i)->chinese,(sp+i)->math,(sp+i)->english);
 		fprintf(students_account_wp,"%s %s %c %c\n",(sp+i)->id,(sp+i)->password,(sp+i)->is_locked,(sp+i)->attempt);
-		fprintf(students_info_wp,"%s %s %c %c\n",(sp+i)->id,(sp+i)->name,(sp+i)->gender,(sp+i)->is_out);
+		fprintf(students_info_wp,"%s %s %s %c\n",(sp+i)->id,(sp+i)->name,(sp+i)->gender,(sp+i)->is_out);
 	}
 
 	fclose(students_score_wp);
@@ -512,7 +505,7 @@ void end()
 	FILE* teacher_account_wp=fopen("teacher_account.txt","w");
 	for(int i=0;i<Total_T;i++)
 	{
-		fprintf(teacher_info_wp,"%s %s %c %c\n",(tp+i)->id,(tp+i)->name,(tp+i)->gender,(tp+i)->is_out);
+		fprintf(teacher_info_wp,"%s %s %s %c\n",(tp+i)->id,(tp+i)->name,(tp+i)->gender,(tp+i)->is_out);
 		fprintf(teacher_account_wp,"%s %s %c %c\n",(tp+i)->id,(tp+i)->password,(tp+i)->is_locked,(tp+i)->attempt);
 	}
 	fclose(teacher_account_wp);

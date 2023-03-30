@@ -17,7 +17,7 @@ typedef struct Student
     int chinese;
     char  is_locked;
     char  is_out;	
-    char gender;
+    char gender[10];
     char attempt;
 } Student;
 typedef struct Teacher
@@ -27,15 +27,15 @@ typedef struct Teacher
 	char id[10];
 	char attempt;
 	char is_locked; //一律0为假 1为真	
-	char gender;//M=male F=female
+	char gender[10];//M=male F=female
 	char is_out;
 } Teacher;
 extern Student *sp;
 extern Teacher *tp;
 extern int Total;
 extern int Total_T;
-
 extern char ID[];
+
 extern char myID[];
 extern Principle principle;
 
